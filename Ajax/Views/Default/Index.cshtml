@@ -1,0 +1,159 @@
+﻿
+@{
+    Layout = null;
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+<div class="container">
+    <br />
+    <br />
+    <h3>Müşteri İşlemleri</h3>
+
+    <button type="button" class="btn btn-outline-primary" id="btnList">Müşteri Listesi</button>
+    <button type="button" class="btn btn-outline-info" id="btnAdd">Müşteri Ekle</button>
+    <button type="button" class="btn btn-outline-dark" id="btnGet">Müşteri Getir</button>
+    <button type="button" class="btn btn-outline-danger" id="btnDelete">Müşteri Sil</button>
+    <button type="button" class="btn btn-outline-success" id="btnUpdate">Müşteri Güncelle</button>
+    <button type="button" class="btn btn-outline-warning" id="btnTable">Müşteri Tablosu</button>
+
+    <br />
+    <hr />
+
+    <div>
+        <h3>Yeni Müşteri Ekleme Sayfası</h3>
+        <br />
+        <label>Müşteri Adı</label>
+        <input type="text" class="form-control" id="txtName" />
+        <br />
+        <label>Müşteri Soyadı</label>
+        <input type="text" class="form-control" id="txtSurname" />
+        <br />
+        <label>Müşteri Şehri</label>
+        <input type="text" class="form-control" id="txtCity" />
+
+        <br />
+        <hr />
+    </div>
+
+    <div>
+        <h3>Müşteri Silme Paneli</h3>
+        <input type="text" class="form-control" id="txtDeletedId" placeholder="Silinecek Müşteri ID Değerini Giriniz" />
+
+        <br />
+        <hr />
+    </div>
+
+    <div id="customerList">
+        <h3>Müşteriler Tablosu</h3>
+        <br />
+        <hr />
+    </div>
+
+    <div>
+        <h3>Müşteri Güncelleme Paneli</h3>
+        <input type="text" class="form-control" id="txtEditCustomerId" placeholder="Güncellenecek ID Değeri" />
+        <br />
+        <input type="text" class="form-control" id="txtEditCustomerName" placeholder="Güncellenecek Ad Değeri" />
+        <br />
+        <input type="text" class="form-control" id="txtEditCustomerSurname" placeholder="Güncellenecek Soyad Değeri" />
+        <br />
+        <input type="text" class="form-control" id="txtEditCustomerCity" placeholder="Güncellenecek Şehir Değeri" />
+        <br />
+    </div>
+
+    <script>
+        $("#btnList").click(function () {
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "Get",
+                url: "/Default/CustomerList/",
+                success: function (funkList) {
+                    let values = jQuery.parseJSON(funkList);
+                    console.log(values);
+                }
+            });
+        });
+
+        $("#btnAdd").click(function () {
+            let values = {
+                CustomerName: $("#txtName").val(),
+                CustomerSurname: $("#txtSurname").val(),
+                CustomerCity: $("#txtCity").val()
+            };
+            $.ajax({
+                type: "Post",
+                url: "/Default/AddCustomer/",
+                data: values,
+                success: function (funkAdd) {
+                    let result = jQuery.parseJSON(funkAdd);
+                    alert("Müşteri Başarılı Bir Şekilde Eklendi");
+                }
+            });
+        });
+
+        $("#btnDelete").click(function () {
+            let id = $("#txtDeletedId").val();
+            $.ajax({
+                url: "/Default/DeleteCustomer/" + id,
+                type: "Get",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (funkDelete) {
+                    alert("Müşteri Başarılı Bir Şekilde Silindi");
+                }
+            });
+        });
+
+        $("#btnTable").click(function () {
+            $.ajax({
+                contentType: "application/json",
+                dataType: "json",
+                type: "Get",
+                url: "/Default/CustomerList/",
+                success: function (funkTable) {
+                    var values = jQuery.parseJSON(funkTable);
+                    let tablehtml = `<table class=table table-bordered>
+                                            <tr>
+                                            <th>Müşteri ID</th>
+                                            <th>Müşteri Adı</th>
+                                            <th>Müşteri Soyadı</th>
+                                            <th>Müşteri Şehri</th>
+                                            </tr>`
+                    $.each(values, (index, value) => {
+                        tablehtml += `<tr>
+                                <td>${value.CustomerID}</td>
+                                <td>${value.CustomerName}</td>
+                                <td>${value.CustomerSurname}</td>
+                                <td>${value.CustomerCity}</td>
+                                </tr>`
+                    });
+                    tablehtml += `</table>`;
+                    $("#customerList").html(tablehtml);
+                }
+            });
+        });
+
+        $("#btnUpdate").click(function () {
+            let values = {
+                CustomerID: $("#txtEditCustomerId").val(),
+                CustomerName: $("#txtEditCustomerName").val(),
+                CustomerSurname: $("#txtEditCustomerSurname").val(),
+                CustomerCity: $("#txtEditCustomerCity").val()
+            };
+            $.ajax({
+                type: "post",
+                url: "/Default/UpdateCustomer/",
+                data: values,
+                success: function (funkUpdate) {
+                    swal("Bravo tebrikler!", "Veriler Güncellendi!", "success");
+                }
+            });
+        });
+
+    </script>
+
+</div>
